@@ -63,7 +63,10 @@ class Admin_model extends CI_Model {
 
     //Get the student & login related details
     public function selected_student($where) {
-        $query = $this->db->select("sc_stu_id, sc_sch_id")
+        $query = $this->db->select("sc_stu_id, sc_sch_id, sc_stu_name,sc_stu_initial_name,
+                    sc_stu_parent_name, sc_stu_phone1,  sc_stu_phone2,  sc_stu_address,
+                    sc_blood_group, sc_stu_photo_url,sc_use_user_name, sc_use_password, 
+                    sc_created_date")
                 ->from('sc_student as su')
                 ->join('sc_user as us', 'us.sc_use_id=su.sc_stu_user_id', 'left')
                 ->where($where)
@@ -103,14 +106,86 @@ class Admin_model extends CI_Model {
         return $query;
     }
     
-    //To get the selected student remarks
-    public function student_remarks($where){
+   
+    /*To get the selected student remarks
+     * @$limt number of records for peage
+     * @$offset starting point of records
+     */
+    public function student_remarks($where,  $limit = NULL, $offset = NULL){
+    
+        $limit_query="->limit($limit,$offset)";
+        if($limit == NULL && $offset == NULL ){
+             $limit_query="";
+        }
         $query = $this->db->select("sc_rem_description,sc_rem_created_date ")
                 ->from('sc_remarks')
-                ->where($where)->order_by("sc_rem_created_date", "desc")
-                ->get()->result();
+                ->where($where)->order_by("sc_rem_created_date", "desc");
+        if($limit !== NULL && $offset !== NULL ){
+             $query->limit($limit,$offset);
+        }
+        $query=$query->get()->result(); 
         return $query;
         
     }
+    /*To get the selected student Payments
+     * @$limt number of records for peage
+     * @$offset starting point 
+    */
+    public function student_paymnets($where,  $limit = NULL, $offset = NULL){
+        $limit_query="->limit($limit,$offset)";
+        if($limit == NULL && $offset == NULL ){
+             $limit_query="";
+        }
+        $query = $this->db->select("sc_pay_description, sc_pay_mode, sc_pay_name,sc_pay_amount, sc_pay_created_date")
+                ->from('sc_payment')
+                ->where($where)->order_by("sc_pay_created_date", "desc");
+        if($limit !== NULL && $offset !== NULL ){
+             $query->limit($limit,$offset);
+        }
+        $query=$query->get()->result(); 
+        return $query;
+    }
+    /*To get the selected student attendance
+     * @$limt number of records for peage
+     * @$offset starting point 
+    */
+    public function student_attendance($where,  $limit = NULL, $offset = NULL){
+        $limit_query="->limit($limit,$offset)";
+        if($limit == NULL && $offset == NULL ){
+             $limit_query="";
+        }
+        $query = $this->db->select("sw.sc_wor_month,sw.sc_wor_no_of_days ,"
+            . " sc_att_attendend_days, sc_att_created_on")
+                ->from('sc_attendence sa')
+                 ->join('sc_working_days as sw', 'sw.sc_wor_id=sa.sc_att_month_id', 'left')
+                ->where($where)->order_by("sc_att_created_on", "desc");
+        if($limit !== NULL && $offset !== NULL ){
+             $query->limit($limit,$offset);
+        }
+        $query=$query->get()->result(); 
+        return $query;
+    }
+    /*To get the selected student results
+     * @$limt number of records for peage
+     * @$offset starting point 
+    */
+    public function student_results($where,  $limit = NULL, $offset = NULL){
+        $limit_query="->limit($limit,$offset)";
+        if($limit == NULL && $offset == NULL ){
+             $limit_query="";
+        }
+        $query = $this->db->select("exam.sc_exa_name,sub.sc_sub_name,sc_mak_marks,"
+            . "sc_mak_subject_id, sc_mak_exam_id, sc_mar_created_on")
+                ->from('sc_marks mar')
+                ->join('sc_subject as sub', 'sub.sc_sub_id=mar.sc_mak_student_id', 'left')
+                ->join('sc_exam as exam', 'exam.sc_exa_id=mar.sc_mak_exam_id', 'left')
+                ->where($where)->order_by("sc_mar_created_on", "desc");
+        if($limit !== NULL && $offset !== NULL ){
+             $query->limit($limit,$offset);
+        }
+        $query=$query->get()->result(); 
+        return $query;
+    }
+    
 
 }

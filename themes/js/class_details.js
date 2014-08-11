@@ -43,8 +43,6 @@ $(function() {
     });
     show_class_section_div(url_type, section_rules,class_rules);
 
- 
-
     //set the main class id
     $("#class_id").click(function() {
         $("#sc_cls_main_class").val($(this).val());
@@ -58,11 +56,6 @@ $(function() {
 
         $("#sc_cls_name").val(class_name);
     });
-
-
-
-
-
 });
 
 //To Show the class related fields (or) section related fields

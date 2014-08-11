@@ -15,8 +15,37 @@
                         <span class="close" data-dismiss="alert">×</span>
                     </div>
                 <?php } ?>
-                <form action="" method="POST" class="form-horizontal" name="exam_subject_form" 
+                <form action="" method="POST" class="add_student_form" name="exam_subject_form" 
                       id="class_form" enctype="multipart/form-data">
+                    
+                                    <div class="form-group">
+                    <label class="col-md-3 control-label ui-sortable">Class Name</label>
+                    <div class="col-md-9 ui-sortable">
+                        <select class="form-control" id="class_id">
+                            <option value="0">Select the class</option>
+
+                        </select>
+
+                    </div>
+                </div>
+
+                <br/><br/>
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label ui-sortable">Section Name</label>
+                    <div class="col-md-9 ui-sortable">
+                        <select class="form-control" id="section_list">
+                            <option value="000">Select the section</option>
+
+                        </select>
+
+                    </div>
+                    <input type="hidden" name="class_value" id="class_value"
+                           value="0" />
+                </div>
+                <br/> <br/>
+                    
+                    
                     <div class="form-group" id="class_div">
                         <label class="col-md-3 control-label ui-sortable">Student UserId </label>
                         <div class="col-md-9 ui-sortable" >
@@ -139,5 +168,69 @@
 </div><!-- end row -->
 
 <script type="text/javascript"  src="<?= JS_PATH ?>jquery.validate.js"></script>
+<script type="text/javascript"  src="<?= JS_PATH ?>common_functions.js"></script>
+<script>
+    $(function(){
+        $('#add_student_form').validate({
+            rules: {
+				class_value: {
+					required: true,
+				} 
+				sc_use_user_name: {
+					required: true,
+				} 
+				sc_use_email: {
+					required: true,
+                    email: true
+				} 
+				sc_stu_name: {
+					required: true,
+				} 
+				sc_stu_initial_name: {
+					required: true,
+				} 
+				sc_stu_parent_name: {
+					required: true,
+				} 
+				sc_stu_address: {
+					required: true,
+				} 
+				
+			},
+			
+			messages: {
+                class_value: {
+					required: true,
+				} 
+				sc_use_user_name: {
+					required: true,
+				} 
+				sc_use_email: {
+					required: true,
+				} 
+				sc_stu_name: {
+					required: true,
+				} 
+				sc_stu_initial_name: {
+					required: true,
+				} 
+				sc_stu_parent_name: {
+					required: true,
+				} 
+				sc_stu_address: {
+					required: true,
+				} 
+				
+ 
+				org_id: {
+					required: "Please select organization ...!",
+				},
+				manager_id: {
+					required: "Please select manager ...!",
+				} 
+			} 
+        });
+    });
+</script>    
 <!--<script type="text/javascript"  src="<?= JS_PATH ?>class_details.js"></script>-->
 

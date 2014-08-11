@@ -18,7 +18,7 @@ class Admin extends CI_Controller {
     }
 
     public function index() {
-        //print_r($this->session->userdata('username'));e();
+       // print_r($this->session->userdata); e();
         if (!$this->session->userdata('username'))
             $this->load->view($this->view_dir . 'index');
         else
@@ -28,13 +28,12 @@ class Admin extends CI_Controller {
     public function login() {
         $UserName = $_POST['UserName'];
         $sPassword = $this->input->post('Password');//Encrypt::encryptData($this->input->post('Password'));
-        $logintype = $this->input->post('LoginType');
-        $type = isset($_POST['Type']) ? $_POST['Type'] : '0';
-        $aUser = $this->admin_model->validate($UserName, $sPassword, $logintype);
-
+       // $logintype = $this->input->post('LoginType');
+        $type = $this->input->post('LoginType');
+        $aUser = $this->admin_model->validate($UserName, $sPassword, $type);
         if (!$aUser)
             @$sMessage = "incorrect";
-        else if ($aUser->type == "admin") {
+        else if ($type == "admin") {
                 $newdata = array(
                     'logged_in' => true,
                     'username' => $aUser->sc_use_user_name,
@@ -51,8 +50,7 @@ class Admin extends CI_Controller {
                     setcookie("auname", $_POST['UserName'], $expire);
                     setcookie("apassword", $_POST['Password'], $expire);
                 }
-                $sMessage = $aUser->type;
-            
+                $sMessage = "Success";
             $this->session->set_userdata($newdata);
         }
         echo @$sMessage;
@@ -215,7 +213,7 @@ class Admin extends CI_Controller {
     }
 
     //To Add & Edit the student
-    public function student_operations($student_id = NULL) {
+    public function student_add($student_id = NULL) {
         if ($this->input->post('submit')) {
 
             $user_data = array('sc_use_user_name' => $this->input->post('sc_use_user_name'),
@@ -229,7 +227,7 @@ class Admin extends CI_Controller {
                 'sc_stu_phone2' => $this->input->post('sc_stu_phone2'),
                 'sc_stu_address' => $this->input->post('sc_stu_address'),
                 'sc_blood_group' => $this->input->post('sc_blood_group'));
-            
+            $class_id=$this->input->post("class_value");
             $type = $this->input->post('type');
 
             $path = FCPATH . 'store/student_images';
@@ -247,6 +245,8 @@ class Admin extends CI_Controller {
                 //insert student details
                 $student_data['sc_created_date'] = current_date_time;
                 $student_data['sc_stu_user_id'] = $user_id;
+                
+                
 
                 if (!$this->upload->do_upload('photo')) {
                     $data['errors'] = $this->upload->display_errors(); // this isn't working
@@ -255,11 +255,23 @@ class Admin extends CI_Controller {
                 }
 
                 $student_data['sc_stu_photo_url'] = $photo['file_name'];
-                $this->admin_model->insert('sc_student', $student_data);
+                $student_id=$this->admin_model->insert('sc_student', $student_data);
+                
+                //insert into class-student
+                $class_student_data=array("sc_class_id"=>$class_id, 
+                                           "sc_student_id"=>$student_id);
+                $this->admin_model->insert('sc_class_students', $class_student_data);
+                
             } else {
                 //user table
                 $u_where = array('sc_use_id' => $this->input->post('sc_stu_user_id'));
                 $this->admin_model->update('sc_user', $user_data, $u_where);
+                
+                //update class-student entry
+                $class_student_update_where=array("sc_student_id"=>$this->input->post('sc_stu_user_id'));
+                $class_student_update_data=array("sc_class_id"=>$class_id );
+                $this->admin_model->update('sc_class_students', $class_student_update_data,
+                    $class_student_update_where);
                 //student table
                 if ($_FILES['photo']["error"] > 0) {
                     $student_data['sc_stu_photo_url'] = $this->input->post('sc_stu_photo_url');
