@@ -15,8 +15,8 @@
                         <span class="close" data-dismiss="alert">×</span>
                     </div>
                 <?php } ?>
-                <form action="" method="POST" class="add_student_form" name="exam_subject_form" 
-                      id="class_form" enctype="multipart/form-data">
+                <form action="" method="POST" class="add_student_form" name="add_student_form" 
+                      id="add_student_form" enctype="multipart/form-data">
                     
                                     <div class="form-group">
                     <label class="col-md-3 control-label ui-sortable">Class Name</label>
@@ -31,7 +31,7 @@
 
                 <br/><br/>
 
-                <div class="form-group">
+                <div class="form-group" id="section_div">
                     <label class="col-md-3 control-label ui-sortable">Section Name</label>
                     <div class="col-md-9 ui-sortable">
                         <select class="form-control" id="section_list">
@@ -170,28 +170,51 @@
 <script type="text/javascript"  src="<?= JS_PATH ?>jquery.validate.js"></script>
 <script type="text/javascript"  src="<?= JS_PATH ?>common_functions.js"></script>
 <script>
+    var main_class_id = '<?=
+                    (@$class_details->sc_cls_main_class > 0) ?
+                        @$class_details->sc_cls_main_class : ""
+                    ?>';
+    var main_class = "",
+        section_id='<?=
+                    (@$class_details->sc_cls_id > 0) ?
+                        @$class_details->sc_cls_id : ""
+                    ?>';
+ 
+ 
     $(function(){
+     
+     //To edit student information set class & section ids
+     if(main_class_id ==="" && section_id.length > 0 ){
+         $("#class_id").val(section_id);
+     }
+     
+    //On click on section & class data
+    $('#class_id, #section_list').click(function() {
+        var class_id = $(this).val();
+        $("#class_value").val(class_id);
+    });
+        
         $('#add_student_form').validate({
             rules: {
 				class_value: {
 					required: true,
-				} 
+				}, 
 				sc_use_user_name: {
 					required: true,
-				} 
+				}, 
 				sc_use_email: {
 					required: true,
                     email: true
-				} 
+				}, 
 				sc_stu_name: {
 					required: true,
-				} 
+				}, 
 				sc_stu_initial_name: {
 					required: true,
-				} 
+				}, 
 				sc_stu_parent_name: {
 					required: true,
-				} 
+				}, 
 				sc_stu_address: {
 					required: true,
 				} 
@@ -200,35 +223,28 @@
 			
 			messages: {
                 class_value: {
-					required: true,
-				} 
+					required: "Please select listbox ...!",
+				}, 
 				sc_use_user_name: {
-					required: true,
-				} 
+					required: "Please enter the user name",
+				}, 
 				sc_use_email: {
-					required: true,
-				} 
-				sc_stu_name: {
-					required: true,
-				} 
-				sc_stu_initial_name: {
-					required: true,
-				} 
-				sc_stu_parent_name: {
-					required: true,
-				} 
-				sc_stu_address: {
-					required: true,
-				} 
-				
- 
-				org_id: {
-					required: "Please select organization ...!",
+					required: "Please enter the email",
 				},
-				manager_id: {
-					required: "Please select manager ...!",
-				} 
-			} 
+				sc_stu_name: {
+					required: "Please enter the student name",
+				}, 
+				sc_stu_initial_name: {
+					required: "Please enter the student initial name",
+				}, 
+				sc_stu_parent_name: {
+					required: "Please enter the student parent name",
+				}, 
+				sc_stu_address: {
+					required: "Please enter the student address",
+				}
+			}
+			
         });
     });
 </script>    

@@ -77,9 +77,7 @@ function show_class_section_div(event_value, section_rules,class_rules){
 
         }
 }
-
  
-
 //Add rules to validator
 function addRules(rulesObj) {
     for (var item in rulesObj) {

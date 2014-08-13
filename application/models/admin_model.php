@@ -187,5 +187,16 @@ class Admin_model extends CI_Model {
         return $query;
     }
     
+    /*
+     * Bring the selected student class detais
+     */
+    public function student_class($where){
+        $query = $this->db->select(" cl.sc_cls_id, cl.sc_cls_main_class")
+        ->from('sc_class_students cs')
+        ->join('sc_class as cl', 'cl.sc_cls_id=cs.sc_class_id', 'left')
+        ->where($where)->get()->row();
+        return $query;
+    }
+    
 
 }

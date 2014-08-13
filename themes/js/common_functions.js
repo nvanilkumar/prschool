@@ -5,7 +5,7 @@ $(function() {
     class_list_array = get_class_list(0);
     markup_select_box("class_id",class_list_array);
 
-    main_class = parseInt(main_class_id);
+    main_class = parseInt(main_class_id);//To set the class
     //main_class_id value is set then only we are activating the section div 
     if(main_class > 0)
     {

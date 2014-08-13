@@ -214,6 +214,7 @@ class Admin extends CI_Controller {
 
     //To Add & Edit the student
     public function student_add($student_id = NULL) {
+        $type='';
         if ($this->input->post('submit')) {
 
             $user_data = array('sc_use_user_name' => $this->input->post('sc_use_user_name'),
@@ -226,9 +227,11 @@ class Admin extends CI_Controller {
                 'sc_stu_phone1' => $this->input->post('sc_stu_phone1'),
                 'sc_stu_phone2' => $this->input->post('sc_stu_phone2'),
                 'sc_stu_address' => $this->input->post('sc_stu_address'),
-                'sc_blood_group' => $this->input->post('sc_blood_group'));
+                'sc_blood_group' => $this->input->post('sc_blood_group'),
+                'sc_fiscalyear_id'=>$this->fiscal_year
+                );
             $class_id=$this->input->post("class_value");
-            $type = $this->input->post('type');
+            $type = (@$this->input->post('type'))?$this->input->post('type'):'';
 
             $path = FCPATH . 'store/student_images';
             $config = array('allowed_types' => 'jpg|jpeg|gif|png',
@@ -255,11 +258,11 @@ class Admin extends CI_Controller {
                 }
 
                 $student_data['sc_stu_photo_url'] = $photo['file_name'];
-                $student_id=$this->admin_model->insert('sc_student', $student_data);
+                $student_insert_id=$this->admin_model->insert('sc_student', $student_data);
                 
                 //insert into class-student
                 $class_student_data=array("sc_class_id"=>$class_id, 
-                                           "sc_student_id"=>$student_id);
+                                           "sc_student_id"=>$student_insert_id);
                 $this->admin_model->insert('sc_class_students', $class_student_data);
                 
             } else {
@@ -286,10 +289,13 @@ class Admin extends CI_Controller {
                 $data['status_message'] = 'sucess';
             }
         }
-        if (isset($student_id)) {
+        if ($student_id) {
+            
             $where = array('sc_stu_id' => $student_id);
             $data['details'] = $this->admin_model->singleRecord_where('sc_student', $where);
-
+            
+            $class_where = array('sc_student_id' => $student_id);
+            $data['class_details'] = $this->admin_model->student_class($class_where);
             $user_where = array('sc_use_id' => $data['details']->sc_stu_user_id);
             $data['user_details'] = $this->admin_model
                 ->singleRecord_where('sc_user', $user_where);
@@ -299,7 +305,6 @@ class Admin extends CI_Controller {
         }
 
         $data['menu_content'] = $this->load->view('school_menu', '', TRUE);
-        //$data['menu_content'] = "";
         $data['content'] = $this->load->view($this->view_dir . "set_student", $data, TRUE);
         $this->load->view('school_template', $data);
     }

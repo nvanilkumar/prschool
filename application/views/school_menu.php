@@ -75,6 +75,7 @@
                     <span>STUDENTS </span>
                 </a>
                 <ul class="sub-menu">
+                    <li><a href="<?= site_url('admin/student_add'); ?>">Add Student</a></li>
                     <li><a href="<?= site_url('admin/test'); ?>">Student Information</a></li>
                     
 

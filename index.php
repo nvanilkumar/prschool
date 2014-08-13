@@ -1,6 +1,4 @@
 <?php
-
-//require('../wordpress/wp-blog-header.php');
 // enable error reporting //
 ini_set('display_errors', 'On');
 error_reporting(-1);
