@@ -2,8 +2,8 @@
 //Get the first parameter value
 $form_name = $this->uri->segment(3);
 //Form Labels Preparation
-$lables_array = array("pageheader" => "Student Information",
-    "page-title" => "Student Information",
+$lables_array = array("pageheader" => "Add Student Information",
+    "page-title" => "Add Student Information",
 );
 ?>
 <div class="row"><!-- begin row -->

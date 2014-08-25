@@ -240,6 +240,7 @@ class Admin extends CI_Controller {
 
             if ($type == 'Add') {
                 //insert user details
+                $photo=array();
                 $user_data['sc_use_password'] = random_string('alnum', 6);
                 $user_data['sc_use_type'] = 'student';
                 $user_data['sc_sch_id'] = $this->school_id;
@@ -252,19 +253,20 @@ class Admin extends CI_Controller {
                 
 
                 if (!$this->upload->do_upload('photo')) {
-                    $data['errors'] = $this->upload->display_errors(); // this isn't working
+                    $data['errors'] = "";//$this->upload->display_errors(); // this isn't working
                 } else {
                     $photo = $this->upload->data();
                 }
 
-                $student_data['sc_stu_photo_url'] = $photo['file_name'];
+                $student_data['sc_stu_photo_url'] = (@$photo['file_name'])?@$photo['file_name']:'';
                 $student_insert_id=$this->admin_model->insert('sc_student', $student_data);
-                
+                //echo $this->db->last_query();exit;
                 //insert into class-student
                 $class_student_data=array("sc_class_id"=>$class_id, 
-                                           "sc_student_id"=>$student_insert_id);
+                                           "sc_student_id"=>$student_insert_id,
+                                             "sc_fiscalyear_id" =>$this->fiscal_year);
                 $this->admin_model->insert('sc_class_students', $class_student_data);
-                
+            
             } else {
                 //user table
                 $u_where = array('sc_use_id' => $this->input->post('sc_stu_user_id'));
@@ -279,10 +281,15 @@ class Admin extends CI_Controller {
                 if ($_FILES['photo']["error"] > 0) {
                     $student_data['sc_stu_photo_url'] = $this->input->post('sc_stu_photo_url');
                 } else {
-                    unlink($path . '/' . $this->input->post('sc_stu_photo_url'));
+                    $file=$path . '/' . @$this->input->post('sc_stu_photo_url');
+                    if(is_file(@$file))
+                    {
+                        unlink($file);
+                    }
+                    
                     $this->upload->do_upload('photo');
-                    $photo = $this->upload->data();
-                    $student_data['sc_stu_photo_url'] = $photo['file_name'];
+                    @$photo = $this->upload->data();
+                    $student_data['sc_stu_photo_url'] = @$photo['file_name'];
                 }
                 $su_where = array('sc_stu_id' => $student_id);
                 $this->admin_model->update('sc_student', $student_data, $su_where);
@@ -301,11 +308,12 @@ class Admin extends CI_Controller {
                 ->singleRecord_where('sc_user', $user_where);
             $data['form_type'] = 'Edit';
         } else {
+            
             $data['form_type'] = 'Add';
         }
 
-        $data['menu_content'] = $this->load->view('school_menu', '', TRUE);
-        $data['content'] = $this->load->view($this->view_dir . "set_student", $data, TRUE);
+        $data['menu_content'] = $this->load->view('school_menu', '', TRUE); 
+        $data['content'] = $this->load->view($this->view_dir . "set_student", $data, TRUE); 
         $this->load->view('school_template', $data);
     }
 
@@ -327,6 +335,48 @@ class Admin extends CI_Controller {
         //e($data);
         $this->load->view('school_template', $data);
         //$this->load->view('new', $data);
+    }
+    
+    //To view the selected student details
+    public function selected_student(){
+        
+        if ($this->input->post('submit')) {
+            
+            $class_id=$this->input->post("class_value");
+            $where = array("sc_cls_id" => $class_id);
+            $data['class_details'] = $this->admin_model->singleRecord_where("sc_class", $where);
+            
+            $type=$this->input->post('student_type');
+            $student_id=$this->input->post('student_list');
+            $remarks_where = array('sc_rem_student_id' => $student_id);
+            $data["remarks"]=$this->admin_model->student_remarks($remarks_where);
+            
+        }
+        
+        
+        $data['menu_content'] = $this->load->view('school_menu', '', TRUE);
+        $data['content'] = $this->load->view($this->view_dir . 'selected_student', $data, TRUE);
+        $this->load->view('school_template', $data);
+        
+    }
+    
+    //To edit the student remarks details
+    public function edit_student_remarks($remarks_id){
+        
+        if(!$remarks_id){
+          redirect("admin");   
+        }
+       $remarks_where = array('sc_rem_id' => $remarks_id); 
+       if ($this->input->post('submit')) {
+            $remarks_data = array('sc_rem_description' => $this->input->post('sc_rem_description'));
+            $data["remarks"]=$this->admin_model->update("sc_remarks",$remarks_data,$remarks_where);
+          $data['edit_message'] = "set";  
+        }
+        
+        $data["remarks"]=$this->admin_model->singleRecord_where("sc_remarks",$remarks_where);
+        $data['menu_content'] = $this->load->view('school_menu', '', TRUE);
+        $data['content'] = $this->load->view($this->view_dir . 'edit_student_remarks', $data, TRUE);
+        $this->load->view('school_template', $data);
     }
 
     public function field_list() {

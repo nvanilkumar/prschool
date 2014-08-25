@@ -117,7 +117,7 @@ class Admin_model extends CI_Model {
         if($limit == NULL && $offset == NULL ){
              $limit_query="";
         }
-        $query = $this->db->select("sc_rem_description,sc_rem_created_date ")
+        $query = $this->db->select("sc_rem_id,sc_rem_description,sc_rem_created_date ")
                 ->from('sc_remarks')
                 ->where($where)->order_by("sc_rem_created_date", "desc");
         if($limit !== NULL && $offset !== NULL ){

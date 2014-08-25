@@ -194,7 +194,7 @@
         $("#class_value").val(class_id);
     });
         
-        $('#add_student_form').validate({
+        $('#add_student_form1').validate({
             rules: {
 				class_value: {
 					required: true,

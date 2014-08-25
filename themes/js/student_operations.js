@@ -235,6 +235,12 @@
                     "Password :" + student.sc_use_password + "<br/>" +
                     "Created Date :" + student.sc_created_date + "<br/>"
                     );
+            var link=$('<a>',{href: baseurl+'admin/student_add/'+student.sc_stu_id });
+                var button = $('<button>', {type: 'button', class: "btn btn-sm btn-success",
+        text: "Edit Student"
+    });
+    link.append(button);
+         $("#default-tab-1").append(link);   
 
        // });
 
@@ -267,14 +273,7 @@
 
     }
 
-    //makeup the student listbox
-    function decorate_student() {
-        $("#student_list").select2({
-            formatResult: format,
-            formatSelection: format
 
-        });
-    }
 
     //returns the student image   
     function format(student) {
@@ -286,43 +285,7 @@
         return "<img class='flag' src='" + baseurl + "store/student_images/" + $(originalOption).data('url') + "' widht=10 height=10/>  " + student.text;
     }
 
-//Brings the class related cross tables data from db
-    function get_student_list(class_id) {
-        var post_url = baseurl + 'remote/class_student_list',
-                result = "",
-                type = $("#page_type").val()
-                ;
-        $.ajax({
-            url: post_url,
-            type: "POST",
-            data: {class_id: class_id},
-            async: false,
-            dataType: 'json',
-            success: function(responseText) {
-                result = responseText;
-            }
 
-        });
-
-        return result;
-    }
-
-//To markup the select box
-//@param element_name -- domelement name
-//@param class_names -- all options values
-    function markup_student_select_box(element_name, class_names)
-    {
-        $('#' + element_name + '  option:gt(0)').remove().end();
-        $.each(class_names, function(index, value) {
-            $('#' + element_name).append($('<option/>', {
-                value: value.sc_stu_id,
-                text: value.sc_stu_name + ' ' + value.sc_stu_initial_name,
-                'data-url': value.sc_stu_photo_url
-            }));
-        });
-
-        //
-    }
 //To markup the exam list select box
 //@param element_name -- domelement name
 //@param class_names -- all options values

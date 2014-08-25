@@ -73,6 +73,7 @@ class Api extends REST_Controller {
         $request_type = $this->get("type");
         $student_details_type = array("remarks", "attendence", "payments");
         $student_key = $this->get("student_key");
+        
         //valid student
         if ($student_key && (in_array($request_type, $student_details_type))) {
             $page_number = ($this->get("page_number")) ? $this->get("page_number") : 1;
@@ -92,7 +93,6 @@ class Api extends REST_Controller {
                 $limit = $records_per_page;
 
                 $data=$this->studnets_details_list($request_type,$student_id,$limit,$offset);
-
             
                 $data["page_number"] = $page_number;
                 $data["records_per_page"] = $records_per_page;

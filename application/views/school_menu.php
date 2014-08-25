@@ -76,63 +76,14 @@
                 </a>
                 <ul class="sub-menu">
                     <li><a href="<?= site_url('admin/student_add'); ?>">Add Student</a></li>
-                    <li><a href="<?= site_url('admin/test'); ?>">Student Information</a></li>
+                    <li><a href="<?= site_url('admin/test'); ?>">Add Student Details</a></li>
+                    <li><a href="<?= site_url('admin/selected_student'); ?>">View Student Details</a></li>
                     
 
                 </ul>
             </li>
             
-            
-         <!--    <li class="has-sub">
-                <a href="javascript:;">
-                    <i class="fa fa-file-o"></i> 
-                    <b class="caret pull-right"></b>
-                    <span>exams</span> 
-                </a>
-                <ul class="sub-menu">
-                    <li><a href="form_elements.html">Exams List</a></li>
-
-                </ul>
-            </li>
-            <li class="has-sub ">
-                <a href="javascript:;">
-                    <b class="caret pull-right"></b>
-                    <i class="fa fa-th"></i> 
-                    <span>Marks</span> 
-                </a>
-                <ul class="sub-menu">
-                    <li><a href="table_basic.html">Basic Tables</a></li>
-
-                </ul>
-            </li>
-            <li class="has-sub">
-                <a href="javascript:;">
-                    <i class="fa fa-envelope"></i>
-                    <b class="caret pull-right"></b>
-                    <span>
-                        Student Section
-                        <span class="label label-success m-l-5">NEW</span>
-                    </span>
-                </a>
-                <ul class="sub-menu">
-                    <li><a href="email_system.html">Attendance reports <i class="fa fa-paper-plane text-success m-l-5"></i></a></li> 
-                </ul>
-            </li>
-            <li><a href="charts.html"><i class="fa fa-signal"></i> <span>Remarks</span></a></li>
-            <li><a href="calendar.html"><i class="fa fa-calendar"></i> <span>payments</span></a></li>
-            <li class="has-sub">
-                <a href="javascript:;">
-                    <i class="fa fa-cogs"></i>
-                    <b class="caret pull-right"></b>
-                    <span>Students</span>
-                </a>
-                <ul class="sub-menu">
-                    <li><a href="page_blank.html">Add student</a></li>
-                    <li><a href="page_with_footer.html">Page with Footer</a></li>
-
-                </ul>
-            </li>-->
-
+      
 
         </ul>
         <!-- end sidebar nav -->
