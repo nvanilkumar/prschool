@@ -12,7 +12,7 @@
          });  
 
         //decorate the student list box
-        decorate_student();
+        //decorate_student();
 
 
         //On click on section & class data
@@ -61,13 +61,13 @@
         });
         
         //Marks tab click to populate the subjects list
-        $("#marks-tab").click(function(){
+        //$("#feed").click(function(){
              student_subjects_markup();
             var objects_list ="";
             objects_list = get_db_class_objects($("#class_value").val(),"class_exams");
             markup_exams_list_box("exams_list",objects_list);
             
-        });
+        //});
         
         
         $("#class_exam_subject").click(function(){
@@ -87,8 +87,8 @@
             data.class_id = $("#class_value").val();
             data.student_id = $("#student_list").val();
             //data.exam_id = $("#exams_list").val();
-            data.subjects=$("#subjects_form").serialize();
-             
+            //data.subjects=$("#subjects_form").serialize();
+            data.subjects=$("#subjects_form").serializeArray(); 
             ajax_send_data(url, data);
 
           $('#default-tab-5-form')[0].reset();
@@ -211,7 +211,7 @@
             dataType: 'json',
             success: function(responseText) {
                 //result = responseText;
-                console.log(responseText);
+                //console.log(responseText);
                 alert("done");
             }
 
@@ -290,7 +290,7 @@
 //@param element_name -- domelement name
 //@param class_names -- all options values
     function markup_exams_list_box(element_name, class_names)
-    {console.log("markup");
+    {//console.log("markup");
         $('#' + element_name + '  option:gt(0)').remove().end();
         $.each(class_names, function(index, value) {
             $('#' + element_name).append($('<option/>', {
@@ -302,3 +302,22 @@
 
         //
     }
+    
+//Brings the class related cross tables data from db
+function get_db_class_objects(class_id, type) {
+    var post_url = baseurl + 'remote/get_class_object_list',
+            result = "";
+    $.ajax({
+        url: post_url,
+        type: "POST",
+        data: {type: type, class_id: class_id},
+        async: false,
+        dataType: 'json',
+        success: function(responseText) {
+            result = responseText;
+        }
+
+    });
+
+    return result;
+}    

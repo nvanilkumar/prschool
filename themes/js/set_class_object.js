@@ -89,9 +89,9 @@ function assign_class_exam(){
        //option_type = (!check_box) ? 1 : 0;
         post_data.option_type=1;//1 for update
         post_data.type="exams";
-        post_data.subjects=$("#subjects_form").serialize();
+        post_data.subjects=$("#subjects_form").serializeArray();
         ajax_send_data(post_url, post_data);
-       // $('#subjects_form')[0].reset();
+        $('#subjects_form')[0].reset();
 
     } else {
         alert("Please enter valid data ...");
@@ -126,9 +126,9 @@ function populate_subjects(objects_list) {
             input_ele = '';
 //markup div element
     var $markup_div = $('<div class="form-group" >' +
-            '<label class="col-md-3 control-label ui-sortable name"></label>' +
-            '<div class="col-md-9 ui-sortable">' +
-            '<input type="text" class="form-control required" placeholder="max marks"\n\
+            '<label class="col-sm-3 control-label no-padding-right name" for="form-field-2"></label>' +
+            '<div class="col-sm-9">' +
+            '<input type="text" class="col-xs-10 col-sm-5 required subject" placeholder="max marks"\n\
                           value=""><br/>' +
             '</div>' +
             '</div><br/>');
@@ -137,7 +137,7 @@ function populate_subjects(objects_list) {
     div_ele.empty();
     for (var i = 0; i < count; i++) {
         $('.name', $markup_div).text(objects_list[i].sc_sub_name);
-        $('.form-control', $markup_div).attr("name", objects_list[i].sc_sub_name);
+        $('.subject', $markup_div).attr("name", objects_list[i].sc_sub_name);
         div_ele.append($markup_div[0].outerHTML);
 
     }

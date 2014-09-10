@@ -5,12 +5,12 @@ $(function() {
     class_list_array = get_class_list(0);
     markup_select_box("class_id", class_list_array);
 
-    main_class = parseInt(main_class_id);//To set the class
+   // main_class = parseInt(main_class_id);//To set the class
     //main_class_id value is set then only we are activating the section div 
-    if (main_class > 0)
-    {
-        set_selectbox_class_name(main_class_id);
-    }
+//    if (main_class > 0)
+//    {
+//        set_selectbox_class_name(main_class_id);
+//    }
 
     $("#class_id").on("click", function() {
         main_class = $(this).val();
@@ -70,7 +70,6 @@ function markup_select_box(element_name, class_names)
         }));
     });
 
-    //
 }
 
 

@@ -89,12 +89,10 @@ class Admin extends CI_Controller {
                 $data['section_lists'] = $this->admin_model->class_section_list($sec_where);
                 break;
             case 'section':
-                $table_name = 'sc_class';
-                $where = array('cl.sc_cls_main_class !=' => 0,
-                    'cl.sc_sch_id' => $this->school_id
-                );
-                $html_file_name = 'class_list_view';
-                $data['lists'] = $this->admin_model->class_subject_list($where);
+               
+                $table_name = 'sc_section';
+                $html_file_name = 'section_list_view';
+                $data['lists'] = $this->admin_model->allRecords($table_name);
                 break;
             case 'subjects':
                 $table_name = 'sc_subject';
@@ -116,10 +114,10 @@ class Admin extends CI_Controller {
         }
 
 
-        $data['menu_content'] = $this->load->view('school_menu', '', TRUE);
+        $data['menu_content'] = $this->load->view('main_menu', '', TRUE);
         $data['content'] = $this->load->view($this->view_dir . $html_file_name, $data, TRUE);
 //e($this->db->last_query());
-        $this->load->view('school_template', $data);
+        $this->load->view('main_template', $data);
     }
 
     /**
@@ -137,6 +135,13 @@ class Admin extends CI_Controller {
                 $table_name = 'sc_class';
                 $field_name = 'sc_cls_id';
                 $html_file_name = 'class_details';
+                //To Bring the subjects
+                $subject_table_name = 'sc_subject';
+                $subject_where = array('sc_sch_id' => $this->school_id);
+                $data['subjects_lists'] = $this->admin_model->allRecords_where($subject_table_name, $subject_where);
+                //To Bring the sections
+                $section_table_name = 'sc_section';
+                $data['section_lists'] = $this->admin_model->allRecords($section_table_name);
                 break;
             case 'subjects':
                 $table_name = 'sc_subject';
@@ -150,9 +155,9 @@ class Admin extends CI_Controller {
                 $html_file_name = 'exam_subject_details';
                 break;
             case 'section':
-                $table_name = 'sc_class';
-                $field_name = 'sc_cls_id';
-                $html_file_name = 'class_details';
+                $table_name = 'sc_section';
+                $field_name = 'sc_sec_id';
+                $html_file_name = 'section_add_edit';
                 break;
 
             case 'student':
@@ -163,27 +168,54 @@ class Admin extends CI_Controller {
             default: $table_name = 'customer';
                 $html_file_name = 'customer_view';
         }
-//e($_POST);
         //To perform the add & edit operations
         if ($this->input->post('submit')) {
             $post_data = $_POST;
-            $post_data['sc_sch_id'] = $this->school_id;
+            $post_data['sc_sch_id'] = $this->school_id; 
             $this->addedit->setData($table_name, $field_name, $field_value);
             $data['message'] = $this->addedit->custom_add_edit_options($post_data);
+            $insert_id= $data['message'];
+            if($table_name === "sc_class"){
+                
+                if(isset($field_value)){
+                    $section_where = array('sc_cls_main_class' => $field_value);
+                    $selected_coulumn_name="sc_cls_id";
+                    $section_list=$this->admin_model->signle_colum('sc_class',$selected_coulumn_name,$section_where);
+
+                    $this->remove_cross_entry($field_value,$section_list);
+                    $insert_id=$field_value;
+                }
+                
+                $this->assign_sections_class($insert_id, $data['section_lists'], $field_value);
+            }
             $data['edit_message'] = "set";
         }
 
         if (isset($field_value)) {
+            
             $where = array($field_name => $field_value);
             $data['details'] = $this->admin_model->singleRecord_where($table_name, $where);
             $data['form_type'] = 'Edit';
+             if($table_name === "sc_class"){
+                //Bring the selected sections 
+                $section_table_name = 'sc_cls_sec';
+                $section_where = array('sc_class_id' => $field_value);
+                $selected_coulumn_name="sc_sec_id";
+                $data['selected_section_ids'] = $this->admin_model->signle_colum($section_table_name,$selected_coulumn_name,$section_where);
+                //Bring the selected subjects
+                $subject_table_name = 'sc_class_subjects';
+                $subject_where = array('sc_class_id' => $field_value);
+                $subject_coulumn_name="sc_subject_id";
+                $data['selected_subject_ids'] = $this->admin_model->signle_colum($subject_table_name,$subject_coulumn_name,$subject_where);
+                
+            }
         } else {
             $data['form_type'] = 'Add';
             $data['edit_message'] = "";
         }
-        $data['menu_content'] = $this->load->view('school_menu', '', TRUE);
+        $data['menu_content'] = $this->load->view('main_menu', '', TRUE);
         $data['content'] = $this->load->view($this->view_dir . $html_file_name, $data, TRUE);
-        $this->load->view('school_template', $data);
+        $this->load->view('main_template', $data);
     }
 
     public function set_class_subject($type) {
@@ -195,21 +227,18 @@ class Admin extends CI_Controller {
                 $data['lists'] = $this->admin_model->allRecords_where($table_name, $where);
                 $data['content'] = $this->load->view($this->view_dir . "set_class_subject", $data, TRUE);
                 break;
-            case 'exams':
+            case 'exams': 
                 $table_name = 'sc_exam';
                 $where = array('sc_sch_id' => $this->school_id);
                 $data['lists'] = $this->admin_model->allRecords_where($table_name, $where);
                 $data['content'] = $this->load->view($this->view_dir . "set_class_exam", $data, TRUE);
                 break;
            
-            default: $table_name = 'customer';
+            default: $table_name = 'none';
         }
 
-
-         $data['menu_content'] = $this->load->view('school_menu','', TRUE);
-        //$data['menu_content'] = "";
-            
-        $this->load->view('school_template', $data);
+         $data['menu_content'] = $this->load->view('main_menu','', TRUE);
+         $this->load->view('main_template', $data);
     }
 
     //To Add & Edit the student
@@ -273,10 +302,11 @@ class Admin extends CI_Controller {
                 $this->admin_model->update('sc_user', $user_data, $u_where);
                 
                 //update class-student entry
-                $class_student_update_where=array("sc_student_id"=>$this->input->post('sc_stu_user_id'));
+                $class_student_update_where=array("sc_student_id"=>$this->input->post('sc_stu_id'));
                 $class_student_update_data=array("sc_class_id"=>$class_id );
                 $this->admin_model->update('sc_class_students', $class_student_update_data,
                     $class_student_update_where);
+               
                 //student table
                 if ($_FILES['photo']["error"] > 0) {
                     $student_data['sc_stu_photo_url'] = $this->input->post('sc_stu_photo_url');
@@ -300,21 +330,21 @@ class Admin extends CI_Controller {
             
             $where = array('sc_stu_id' => $student_id);
             $data['details'] = $this->admin_model->singleRecord_where('sc_student', $where);
-            
+           // echo $this->db->last_query();
             $class_where = array('sc_student_id' => $student_id);
             $data['class_details'] = $this->admin_model->student_class($class_where);
             $user_where = array('sc_use_id' => $data['details']->sc_stu_user_id);
             $data['user_details'] = $this->admin_model
                 ->singleRecord_where('sc_user', $user_where);
-            $data['form_type'] = 'Edit';
+            $data['form_type'] = 'Edit'; 
         } else {
             
             $data['form_type'] = 'Add';
         }
 
-        $data['menu_content'] = $this->load->view('school_menu', '', TRUE); 
+        $data['menu_content'] = $this->load->view('main_menu', '', TRUE); 
         $data['content'] = $this->load->view($this->view_dir . "set_student", $data, TRUE); 
-        $this->load->view('school_template', $data);
+        $this->load->view('main_template', $data);
     }
 
     public function test() {//e(1);
@@ -338,7 +368,7 @@ class Admin extends CI_Controller {
     }
     
     //To view the selected student details
-    public function selected_student(){
+    public function selected_student($student_id){
         
         if ($this->input->post('submit')) {
             
@@ -352,11 +382,18 @@ class Admin extends CI_Controller {
             $data["remarks"]=$this->admin_model->student_remarks($remarks_where);
             
         }
-        
-        
-        $data['menu_content'] = $this->load->view('school_menu', '', TRUE);
-        $data['content'] = $this->load->view($this->view_dir . 'selected_student', $data, TRUE);
-        $this->load->view('school_template', $data);
+        $month_where = array('sc_wor_fis_id' => $this->fiscal_year,
+            'sc_sch_id' => $this->school_id
+        );
+        $data['month_details'] = $this->admin_model
+            ->allRecords_where('sc_working_days', $month_where);
+        $st_where = array('sc_stu_id' => $student_id);
+        $data["student_details"]=$this->admin_model->selected_student($st_where);
+        $remarks_where = array('sc_rem_student_id' => $student_id);
+        $data["remarks"]=$this->admin_model->student_remarks($remarks_where);
+        $data['menu_content'] = $this->load->view('main_menu', '', TRUE);
+        $data['content'] = $this->load->view($this->view_dir . 'student_details_view', $data, TRUE);
+        $this->load->view('main_template', $data);
         
     }
     
@@ -395,6 +432,124 @@ class Admin extends CI_Controller {
             e($field_list);
         }
         $this->load->view('new');
+    }
+    
+    public function subject_add(){
+        $data['menu_content'] = $this->load->view('main_menu', '', TRUE);
+        $data['content'] = $this->load->view($this->view_dir . 'subject_add', $data, TRUE);
+        $this->load->view('main_template', $data);
+        
+    }
+    
+    //$option_type --set for edit /other wise new entry
+    
+    
+    public function assign_sections_class($class_id, $section_list, $option_type ) {
+        $section_ids = $this->input->post('section_list');
+        $section_table_name = 'sc_class';
+        $class_section_table_name = 'sc_cls_sec';
+        foreach ($section_ids as $section_id) {
+            //add class_section
+            $class_section_data = array('sc_class_id' => $class_id,
+                'sc_sec_id' => $section_id);
+            $this->admin_model->insert($class_section_table_name, $class_section_data);
+            //add entry in  class table
+            $section_name = $this->section_name($section_list, $section_id);
+            $section_data = array('sc_cls_name' => $section_name,
+                'sc_cls_main_class' => $class_id,
+                'sc_sch_id' => $this->school_id );
+            $class_ids[]=$this->admin_model->insert($section_table_name, $section_data);
+        }
+        $class_ids[]=$class_id;
+        $this->assign_subjects_to_section($class_ids);
+    }
+    //Assign subjects to section & class
+    public function assign_subjects_to_section($section_ids) {
+        $subject_ids = $this->input->post('subject_list');
+        foreach($section_ids as $class_id){
+            foreach ($subject_ids as $value) {
+                $subject_id = $value;
+                $table_name = 'sc_class_subjects';
+                $data = array('sc_class_id' => $class_id,
+                    'sc_subject_id' => $subject_id,
+                    'sc_fiscalyear_id' => $this->fiscal_year
+                );
+                $this->admin_model->insert($table_name, $data);
+
+            }
+            
+        }
+
+    }
+
+    //Returns the sections name by sending the selected section
+    public function section_name($section_list, $section_id) {
+        foreach ($section_list as $section) {
+            if ($section->sc_sec_id == $section_id)
+                return $section->sc_sec_name;
+        }
+    }
+    
+    //To remove the cross table entries of class_section, class_subject, class table
+    public function remove_cross_entry($class_id,$section_list){
+        //Remove the subjects related to class and its sections
+        foreach ($section_list as $section) {
+            $section_where=array("sc_class_id" =>$section->sc_cls_id );
+            $this->admin_model->delete_row("sc_class_subjects", $section_where);
+        }
+        $where=array("sc_class_id" =>$class_id );
+        $this->admin_model->delete_row("sc_class_subjects", $where);
+        
+        //Remove class_section table
+        $class_section_where=array("sc_class_id" =>$class_id );
+        $this->admin_model->delete_row("sc_cls_sec", $class_section_where);
+        
+        //Remove section related to the class
+        $class_where=array("sc_cls_main_class" =>$class_id );
+        $this->admin_model->delete_row("sc_class", $class_where);
+    }
+    
+    //Add Student details
+    public function student_list(){
+        if ($this->input->post('submit')) {
+            $class_id=$this->input->post('class_value');
+            //student list
+            $where = array('sc_class_id' => $class_id);
+            $data["lists"]=$this->admin_model->class_student_list($where);
+            //class details
+            $class_where = array('sc_cls_id' => $class_id);
+            $data['class_details'] = $this->admin_model->singleRecord_where("sc_class",$class_where);
+            
+        }
+        $data['menu_content'] = $this->load->view('main_menu', '', TRUE);
+        $data['content'] = $this->load->view($this->view_dir . 'student_list', $data, TRUE);
+        $this->load->view('main_template', $data);
+    }
+    public function student_details_add($student_id){
+        $month_where = array('sc_wor_fis_id' => $this->fiscal_year,
+            'sc_sch_id' => $this->school_id
+        );
+        $data['month_details'] = $this->admin_model
+            ->allRecords_where('sc_working_days', $month_where);
+        $st_where = array('sc_stu_id' => $student_id);
+        $data["student_details"]=$this->admin_model->selected_student($st_where);
+        $data['menu_content'] = $this->load->view('main_menu', '', TRUE);
+        $data['content'] = $this->load->view($this->view_dir . 'student_details_add', $data, TRUE);
+        $this->load->view('main_template', $data);
+    }
+    
+    public function check($student_id){
+        $month_where = array('sc_wor_fis_id' => $this->fiscal_year,
+            'sc_sch_id' => $this->school_id
+        );
+        $data['month_details'] = $this->admin_model
+            ->allRecords_where('sc_working_days', $month_where);
+        $st_where = array('sc_stu_id' => $student_id);
+        $data["student_details"]=$this->admin_model->selected_student($st_where);
+        $data['menu_content'] = "";//$this->load->view('main_menu', '', TRUE);
+        $data['content'] = $this->load->view($this->view_dir . 'check', $data, TRUE);
+        $this->load->view('template', $data);
+        
     }
 
 }

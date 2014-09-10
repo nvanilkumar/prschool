@@ -50,14 +50,20 @@ class Admin_model extends CI_Model {
         $this->db->delete($table_name, $where);
         return $this->db->affected_rows();
     }
+    
+    //To Bring the selected filed name values
+    public function signle_colum($table_name,$field_name,$where){
+        return $this->db->select($field_name)->get_where($table_name, $where)->result();
+    }
 
     //To Bring the selected class students list
     public function class_student_list($where) {
-        $query = $this->db->select("sc_stu_id, sc_stu_name, sc_stu_initial_name, sc_stu_user_id, sc_stu_photo_url")
+        $query = $this->db->select("sc_stu_id, sc_stu_name, sc_stu_initial_name, sc_stu_phone1, sc_stu_address, sc_stu_user_id, sc_stu_photo_url")
                 ->from('sc_student as su')
                 ->join('sc_class_students as cs', 'cs.sc_student_id=su.sc_stu_id', 'left')
                 ->where($where)
                 ->get()->result();
+       
         return $query;
     }
 
@@ -65,10 +71,11 @@ class Admin_model extends CI_Model {
     public function selected_student($where) {
         $query = $this->db->select("sc_stu_id, sc_sch_id, sc_stu_name,sc_stu_initial_name,
                     sc_stu_parent_name, sc_stu_phone1,  sc_stu_phone2,  sc_stu_address,
-                    sc_blood_group, sc_stu_photo_url,sc_use_user_name, sc_use_password, 
-                    sc_created_date")
+                    sc_blood_group, sc_stu_photo_url,sc_use_user_name, sc_use_password,sc_use_email, 
+                    sc_created_date, sc_class_id")
                 ->from('sc_student as su')
                 ->join('sc_user as us', 'us.sc_use_id=su.sc_stu_user_id', 'left')
+                ->join('sc_class_students as class', 'class.sc_student_id=su.sc_stu_id', 'left')
                 ->where($where)
                 ->get()->row();
         return $query;

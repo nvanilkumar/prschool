@@ -95,7 +95,8 @@ class remote extends Acl_Controller {
                 $exam_id = $this->input->post('exam_id');
                 $data = array('sc_class_id' => $class_id,
                     'sc_exam_id' => $exam_id );
-                parse_str($_POST['subjects'], $subjects);
+               // parse_str($_POST['subjects'], $subjects);
+                $subjects=$_POST['subjects'];
                 $this->set_max_marks_subjects($class_id, $exam_id, $subjects);
                 break;
             case 'student':
@@ -187,14 +188,16 @@ class remote extends Acl_Controller {
         $table_name = 'sc_marks';
         $class_id = $this->input->post('class_id');
         $subject_list = $this->class_subject_list('sc_class_students', $class_id);
-        parse_str($_POST['subjects'], $subjects);
-            
+        //parse_str(urldecode($_POST['subjects']), $subjects); 
+        $subjects=$_POST['subjects'];
+
         $data = array('sc_mak_student_id' =>  $this->input->post('student_id'),
-                    'sc_mak_exam_id' =>  $subjects["exams_list"],
+                    'sc_mak_exam_id' => $this->subject_value($subjects, "exams_list"),
                     'sc_mar_created_on' =>current_date_time,
                     'sc_fiscalyear_id' => $this->fiscal_year ); 
+            
         foreach ($subject_list as $subject) {
-            $data['sc_mak_marks']=$subjects[$subject->sc_sub_name];
+            $data['sc_mak_marks']=$this->subject_value($subjects, $subject->sc_sub_name);
             $data['sc_mak_subject_id']=$subject->sc_sub_id;
             $this->admin_model->insert($table_name, $data);
         }
@@ -251,9 +254,24 @@ class remote extends Acl_Controller {
             $data = array('sc_class_id' => $class_id,
                 'sc_exam_id' => $exam_id,
                 'sc_subject_id' => $subject->sc_sub_id,
-                'sc_subj_max_marks' => $subjects[$subject->sc_sub_name]);
-            $status = $this->admin_model->insert($table_name, $data);
+                'sc_subj_max_marks' => $this->subject_value($subjects, $subject->sc_sub_name));
+            $records_count = $this->admin_model->singleRecord_where($table_name, $data);
+            if (count($records_count) == 0) {
+                 $status = $this->admin_model->insert($table_name, $data);
+            } else {
+                $status = 'record exist in db';
+            }
+            
         }
+    }
+    
+    //returns the subject value in post data
+    public function subject_value($subjects, $subject_name){
+        foreach($subjects as $v){
+            if($subject_name == $v['name'] )
+                return $v['value'];
+                
+            }
     }
 
 }

@@ -1,36 +1,21 @@
-<?php
-$type=$this->uri->segment(3);
-
-?>
-<!-- begin page-header -->
-<h1 class="page-header">Class List </h1>
-<!-- end page-header -->
-
-<!-- begin row -->
-<div class="row">
-    <!-- begin col-12 -->
-    <div class="col-md-12">
-        <!-- begin panel -->
-        <div class="panel panel-inverse">
-            <div class="panel-heading">
-
-                <h4 class="panel-title">Table in Panel</h4>
-            </div>
-            <div class="panel-body">
-                <div class="table-responsive">
-                    <table id="data-table" class="table table-striped table-bordered dataTable"> 
-                        <thead> 
-                            <tr> 
-                                <th class="header"></th> 
-                                <th class="header">Class Name</th> 
-                                <th class="header">Subject Names</th>
-                                <?php if($type != 'section'){ ?>
-                                <th class="header">Section Names</th> 
-                                <?php } ?>
-                                <th class="header">Actions</th> 
-                            </tr> 
-                        </thead> 
-                        <tbody>
+ <div class="page-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- PAGE CONTENT BEGINS -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3 class="header smaller lighter blue">View Classes</h3>
+                    <div class="table-responsive">
+                        <table id="data-table" class="table table-striped table-bordered table-hover">                             <thead> 
+                                <tr> 
+                                    <th class="header">S.No</th> 
+                                    <th class="header">Class Name</th> 
+                                    <th class="header">Subject Names</th>
+                                    <th class="header">Section Names</th> 
+                                    <th class="header">Actions</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody>
                             <?php
                             $i = 1;
                             $previous_id = 0;
@@ -43,8 +28,8 @@ $type=$this->uri->segment(3);
 
                                        
                                         <td> <?= subject_list($lists, $row_data->sc_cls_id,'subject' ) ?> </td>
-                                         <?php if($type != 'section'){ ?>
-                                        <td><?= subject_list($section_lists, $row_data->sc_cls_id,'section') ?> </td><?php } ?>
+                                         
+                                        <td><?= subject_list($section_lists, $row_data->sc_cls_id,'section') ?> </td> 
                                          <td>
                                             <a href="<?= BASEURL ?>admin/opertions/class/<?= $row_data->sc_cls_id ?>" class="btn btn-primary btn-xs m-r-5">Edit</a>
 
@@ -57,21 +42,27 @@ $type=$this->uri->segment(3);
                             }
                             ?>
                         </tbody> 
-                    </table>
+                        </table>
 
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- end panel -->
-    </div>
-    <!-- end col-12 -->
-</div>
-<!-- end row --> 
-<link href="<?= PLUGIN_PATH ?>DataTables-1.9.4/css/data-table.css" rel="stylesheet" />
-<script src="<?= PLUGIN_PATH ?>DataTables-1.9.4/js/jquery.dataTables.js"></script>
-<script src="<?= PLUGIN_PATH ?>DataTables-1.9.4/js/data-table.js"></script>
+
+            <!-- PAGE CONTENT ENDS -->
+        </div><!-- /.col -->
+    </div><!-- /.row -->
+</div><!-- /.page-content -->
 
 
+<script src="<?= CSS_PATH ?>assets/js/jquery.dataTables.min.js"></script>
+<script src="<?= CSS_PATH ?>assets/js/jquery.dataTables.bootstrap.js"></script>
+
+<script type="text/javascript">
+    jQuery(function($) {
+        var oTable1 = $('#data-table').dataTable({
+        });
+    });
+</script> 
 
 <?php
 
